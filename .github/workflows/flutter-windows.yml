@@ -1,0 +1,34 @@
+name: Build Flutter Windows App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v3
+
+      - name: Flutter installieren
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - name: Abhängigkeiten holen
+        run: flutter pub get
+        working-directory: knoppeltunier
+
+      - name: Windows-App bauen
+        run: flutter build windows
+        working-directory: knoppeltunier
+
+      - name: Artefakte hochladen
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-app
+          path: knoppeltunier/build/windows/runner/Release/
