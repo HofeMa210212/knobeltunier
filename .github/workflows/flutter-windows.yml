@@ -18,6 +18,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.19.0
+          cache: true
 
       - name: Abhängigkeiten holen
         run: flutter pub get
