@@ -1,4 +1,4 @@
-name: Build Flutter Windows App
+name: Build Flutter Windows Apps
 
 on:
   push:
@@ -18,20 +18,40 @@ jobs:
         with:
           flutter-version: 3.19.0
 
-      - name: Upgrade Flutter
+      # Erster Build: knoppeltunier
+      - name: Upgrade Flutter für knoppeltunier
         run: flutter upgrade
-        working-directory: knoppeltunier  # Falls dein Flutter-Projekt in einem Unterordner liegt
+        working-directory: knoppeltunier
 
-      - name: Abhängigkeiten holen
+      - name: Abhängigkeiten holen für knoppeltunier
         run: flutter pub get
         working-directory: knoppeltunier
 
-      - name: Windows-App bauen
+      - name: Windows-App bauen für knoppeltunier
         run: flutter build windows
         working-directory: knoppeltunier
 
-      - name: Artefakte hochladen
+      - name: Artefakte hochladen für knoppeltunier
         uses: actions/upload-artifact@v4
         with:
-          name: windows-app
+          name: windows-app-knoppeltunier
           path: knoppeltunier/build/windows/x64/runner/Release/
+
+      # Zweiter Build: knoppeltunier_view
+      - name: Upgrade Flutter für knoppeltunier_view
+        run: flutter upgrade
+        working-directory: knoppeltunier_view
+
+      - name: Abhängigkeiten holen für knoppeltunier_view
+        run: flutter pub get
+        working-directory: knoppeltunier_view
+
+      - name: Windows-App bauen für knoppeltunier_view
+        run: flutter build windows
+        working-directory: knoppeltunier_view
+
+      - name: Artefakte hochladen für knoppeltunier_view
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-app-knoppeltunier-view
+          path: knoppeltunier_view/build/windows/x64/runner/Release/
