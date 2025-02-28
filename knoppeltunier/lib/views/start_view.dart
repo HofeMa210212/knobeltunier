@@ -29,6 +29,9 @@ class _StartViewState extends State<StartView>{
 
    int selectetColumn = 0;
 
+   bool withPlaces = false;
+   bool withTime = false;
+
 
 
   TextEditingController tournamentNameController = TextEditingController();
@@ -125,7 +128,6 @@ class _StartViewState extends State<StartView>{
 
     setState(() {
       _tournaments[selectedTournament].getPlayersFromDb();
-
     });
   }
 
@@ -637,11 +639,11 @@ class _StartViewState extends State<StartView>{
                     ),
                   ),
         
-                  //Formular für Match
+                  //Formular für Player
                   Center(
                     child: Container(
                       margin: EdgeInsets.only(top: 5),
-                      height: 470,
+                      height: 430,
                       width: MediaQuery.of(context).size.width*0.4,
                       decoration: BoxDecoration(
                           color: basicContainerColor,
@@ -694,30 +696,30 @@ class _StartViewState extends State<StartView>{
                           ),
                           Container(
                               margin: EdgeInsets.only(top: 10),
-                              child: CustomTextField(width: MediaQuery.of(context).size.width*0.4, hintText: "", controller: playerLifeController, onlyNumbers: true, maxNumber: 5,)
+                              child: CustomTextField(width: MediaQuery.of(context).size.width*0.4, hintText: "", controller: playerLifeController, onlyNumbers: true, maxNumber: _tournaments[selectedTournament].getAvailableTickets(),)
                           ),
         
         
                           Center(
                             child: Container(
-                              margin: EdgeInsets.only(top: 55),
+                              margin: EdgeInsets.only(top: 15),
                               child: ElevatedButton(
                                 onPressed: () {
-        
+
                                   Player p = Player(fName: playerFNameController.text, lName: playerLNameController.text, lifes: int.parse(playerLifeController.text));
-        
+
                                   setState(() {
                                     if(!_tournaments[selectedTournament].hasPlayer(p)){
                                       _tournaments[selectedTournament].addPlayer(p, _tournaments[selectedTournament].id, context);
-        
+
                                       playerFNameController.text = "";
                                       playerLNameController.text = "";
                                       playerLifeController.text = "";
                                     }
                                     _tournaments[selectedTournament].getPlayersFromDb();
-        
+
                                   });
-        
+
                                 },
                                 style: ButtonStyle(
                                   backgroundColor: WidgetStateProperty.resolveWith((states) {
@@ -750,7 +752,7 @@ class _StartViewState extends State<StartView>{
                                           fontSize: 20,
                                         ),
                                       ),
-        
+
                                     ],
                                   ),
                                 ),
@@ -763,7 +765,65 @@ class _StartViewState extends State<StartView>{
                     ),
                   ),
 
+                  Container(
+                    width: MediaQuery.of(context).size.width*0.4,
+                    height: 50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          children: [
+                            Checkbox(
+                              
+                              value: withPlaces,
+                              onChanged: (value){
+                                setState(() {
+                                  withPlaces = value!;
+                                });
+                              },
+                              activeColor: Colors.green,
+                            
+                            ),
+                            Text(
+                            "Plätze generieren",
+                              style: GoogleFonts.roboto(
+                                color: Colors.white70,
+                                fontSize: 18,
+                              ),
+
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Checkbox(
+
+                              value: withTime,
+                              onChanged: (value){
+                                setState(() {
+                                  withTime = value!;
+                                });
+                              },
+                              activeColor: Colors.green,
+
+                            ),
+                            Text(
+                            "Startzeiten generieren",
+                              style: GoogleFonts.roboto(
+                                color: Colors.white70,
+                                fontSize: 18,
+                              ),
+
+                            )
+                          ],
+                        ),
+
+                      ],
+                    ),
+                  ),
+
                   // Container zum hinzufügen von Places
+                  (withPlaces) ?
                   Center(
                     child: Container(
                       margin: EdgeInsets.only(top: 5),
@@ -942,7 +1002,7 @@ class _StartViewState extends State<StartView>{
                       ),
                     ),
 
-                  ),
+                  ) : Container(),
 
                   //Buttons und auswahl zum erstellen von Matches
                   Row(
@@ -966,10 +1026,36 @@ class _StartViewState extends State<StartView>{
                           ),
                           onPressed: () {
                             setState(() {
-                              _tournaments[selectedTournament].createMatches(selectedTime, int.parse(matchTimeController.text));
                               snackBar s = snackBar();
-                              s.showAppleStyleSnackbar(
-                                  context, "Matches erfolgreich erstellt");
+
+                              if(!withPlaces){
+                                if(_tournaments[selectedTournament].places.isEmpty){
+                                  _tournaments[selectedTournament].addMatchPlace(MatchPlace(startime: DateTime.now(), matchLength: 0, name: "Not a real Place"),_tournaments[selectedTournament].id);
+                                }
+                              }
+                              if(!withTime){
+                                matchTimeController.text = "1";
+                              }
+
+                              if(withPlaces && _tournaments[selectedTournament].places.isEmpty){
+                                s.showFailureSnackbar(context, "Es müssen zuerst Plätze hinzugefügt werden");
+                                throw "No places added";
+                              }
+
+                              if(withTime && matchTimeController.text == ""){
+                                s.showFailureSnackbar(context, "Es muss zuerst eine Matchlänge eingegeben werden");
+                                throw "No time selected";
+                              }
+
+
+
+                              _tournaments[selectedTournament].createMatches(selectedTime, int.parse(matchTimeController.text));
+
+
+
+
+
+                              s.showAppleStyleSnackbar(context, "Matches erfolgreich erstellt");
                             });
                           },
                           child: Text(
@@ -982,6 +1068,7 @@ class _StartViewState extends State<StartView>{
                         ),
                       ),
 
+                      if(withTime)...[
                       // Container für die Zeitwahl
                       Container(
                         width: 110,
@@ -1069,6 +1156,7 @@ class _StartViewState extends State<StartView>{
                           ),
                         ),
                       ),
+                      ]
                     ],
                   ),
 

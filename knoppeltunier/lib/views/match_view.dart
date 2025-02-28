@@ -537,183 +537,171 @@ class _MatchViewState extends State<MatchView> {
 
             if(tournament.matches.length >5)...[
               Container(
-                  height: rowHight * (tournament.matches.length / 3).ceil(),
-                  width: MediaQuery.of(context).size.width * 0.33,
-                  child: ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount:(tournament.matches.length / 3).ceil(),
-                    itemBuilder: (context, index){
-                      int matchIndex = ((tournament.matches.length / 3).ceil() * 2) + index;
-                      if(matchIndex >= tournament.matches.length) matchIndex --;
-                      if (matchIndex <= tournament.matches.length ) {
-                        return Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
-                          height: rowHight,
-                          decoration: BoxDecoration(
-                            color: (markePlayedMatches && tournament.matches[matchIndex].winner != null)
-                                ? Color(0x27858585)  // Grau, wenn makePlayedMatches true und winner null
-                                : ((matchIndex % 2 == 0) ? basicContainerColor : basicContainerColor2),
+                height: rowHight * ((tournament.matches.length / 3).ceil()),
+                width: MediaQuery.of(context).size.width * 0.33,
+                child: ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  // Es sollen nur die restlichen Matches angezeigt werden:
+                  itemCount: tournament.matches.length - (((tournament.matches.length / 3).ceil()) * 2),
+                  itemBuilder: (context, index) {
+                    int rowsPerColumn = (tournament.matches.length / 3).ceil();
+                    int baseIndex = rowsPerColumn * 2;
+                    int matchIndex = baseIndex + index;
+
+                    final match = tournament.matches[matchIndex];
+
+                    return Container(
+                      width: MediaQuery.of(context).size.width * 0.33,
+                      height: rowHight,
+                      decoration: BoxDecoration(
+                        color: (markePlayedMatches && match.winner != null)
+                            ? Color(0x27858585)
+                            : ((matchIndex % 2 == 0) ? basicContainerColor : basicContainerColor2),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.03,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Center(
+                                child: AutoSizeText(
+                                  "${matchIndex + 1}.",
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.white60,
+                                    fontSize: 18,
+                                  ),
+                                  maxFontSize: 18,
+                                ),
+                              ),
+                            ),
                           ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.03,
-
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Center(
-                                    child: AutoSizeText(
-                                      "${matchIndex+1}.",
-                                      style: GoogleFonts.roboto(
-                                          color: Colors.white60,
-                                          fontSize: 18),
-                                      maxFontSize: 18,
-                                    ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.03,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Center(
+                                child: AutoSizeText(
+                                  "${match.time?.hour.toString().padLeft(2, '0')}:${match.time?.minute.toString().padLeft(2, '0')}",
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.white60,
+                                    fontSize: 18,
                                   ),
+                                  maxFontSize: 18,
                                 ),
                               ),
-
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.03,
-
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Center(
-                                    child: AutoSizeText(
-                                      "${tournament.matches[matchIndex].time?.hour.toString().padLeft(2, '0')}:${tournament.matches[matchIndex].time?.minute.toString().padLeft(2, '0')}"
-                                      ,
-                                      style: GoogleFonts.roboto(
-                                          color: Colors.white60,
-                                          fontSize: 18),
-                                      maxFontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Container(
-                                height: rowHight,
-                                width: MediaQuery.of(context).size.width * 0.025,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: IconButton(
-                                    onPressed: (){
-                                      setState(() {
-                                        tournament.matches[matchIndex].setWinner(tournament.matches[matchIndex].player1);
-
-
-
-                                      });
-                                    },
-                                    icon: Icon(
-                                      (tournament.matches[matchIndex].winner?.id == tournament.matches[matchIndex].player2.id)? Symbols.close : Symbols.trophy_sharp,
-
-                                      color: (tournament.matches[matchIndex].winner == null) ? Colors.white12 : (tournament.matches[matchIndex].winner?.id == tournament.matches[matchIndex].player1.id) ? Colors.green : basicAppRed,
-                                      size: 30,
-                                      weight: 1000,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Container(
-                                margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.02),
-                                width: MediaQuery.of(context).size.width * 0.07,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Center(
-                                    child: AutoSizeText(
-                                      "${tournament.matches[matchIndex].player1.fName} ${tournament.matches[matchIndex].player1.lName[0]}.",
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.white70,
-                                        fontSize: 20,
-                                      ),
-                                      // maxFontSize: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Container(
-                                margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.02),
-                                width: MediaQuery.of(context).size.width * 0.02,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Center(
-                                    child: AutoSizeText(
-                                      "VS",
-                                      style: GoogleFonts.roboto(
-                                          color: Colors.white54,
-                                          fontSize: 18
-                                      ),
-                                      maxFontSize: 18,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Container(
-                                margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.02),
-                                width: MediaQuery.of(context).size.width * 0.07,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Center(
-                                    child: AutoSizeText(
-                                      "${tournament.matches[matchIndex].player2.fName} ${tournament.matches[matchIndex].player2.lName[0]}.",
-                                      style: GoogleFonts.roboto(
-                                          color: Colors.white70,
-                                          fontSize: 20
-                                      ),
-                                      maxFontSize: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Container(
-                                height: rowHight,
-                                width: MediaQuery.of(context).size.width * 0.025,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: IconButton(
-                                    onPressed: (){
-                                      setState(() {
-
-                                        tournament.matches[matchIndex].setWinner(tournament.matches[matchIndex].player2);
-
-                                      });
-                                    },
-                                    icon: Icon(
-                                      (tournament.matches[matchIndex].winner?.id == tournament.matches[matchIndex].player1.id)? Symbols.close : Symbols.trophy_sharp,
-                                      color: (tournament.matches[matchIndex].winner == null) ? Colors.white12 : (tournament.matches[matchIndex].winner?.id == tournament.matches[matchIndex].player2.id) ? Colors.green : basicAppRed,
-                                      size: 30,
-                                      weight: 1000,
-
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        );
-                      } else {
-                        return Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
-                          height: rowHight,
-                          decoration: BoxDecoration(
-                            color: (matchIndex % 2 == 0)
-                                ? basicContainerColor
-                                : basicContainerColor2,
+                          Container(
+                            height: rowHight,
+                            width: MediaQuery.of(context).size.width * 0.025,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    match.setWinner(match.player1);
+                                  });
+                                },
+                                icon: Icon(
+                                  (match.winner?.id == match.player2.id)
+                                      ? Symbols.close
+                                      : Symbols.trophy_sharp,
+                                  color: (match.winner == null)
+                                      ? Colors.white12
+                                      : (match.winner?.id == match.player1.id)
+                                      ? Colors.green
+                                      : basicAppRed,
+                                  size: 30,
+                                  weight: 1000,
+                                ),
+                              ),
+                            ),
                           ),
-                        );
-                      }
+                          Container(
+                            margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.02),
+                            width: MediaQuery.of(context).size.width * 0.07,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Center(
+                                child: AutoSizeText(
+                                  "${match.player1.fName} ${match.player1.lName[0]}.",
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.white70,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.02),
+                            width: MediaQuery.of(context).size.width * 0.02,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Center(
+                                child: AutoSizeText(
+                                  "VS",
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.white54,
+                                    fontSize: 18,
+                                  ),
+                                  maxFontSize: 18,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.02),
+                            width: MediaQuery.of(context).size.width * 0.07,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Center(
+                                child: AutoSizeText(
+                                  "${match.player2.fName} ${match.player2.lName[0]}.",
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.white70,
+                                    fontSize: 20,
+                                  ),
+                                  maxFontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: rowHight,
+                            width: MediaQuery.of(context).size.width * 0.025,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    match.setWinner(match.player2);
+                                  });
+                                },
+                                icon: Icon(
+                                  (match.winner?.id == match.player1.id)
+                                      ? Symbols.close
+                                      : Symbols.trophy_sharp,
+                                  color: (match.winner == null)
+                                      ? Colors.white12
+                                      : (match.winner?.id == match.player2.id)
+                                      ? Colors.green
+                                      : basicAppRed,
+                                  size: 30,
+                                  weight: 1000,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              )
 
-
-                    },
-
-                  )
-              ),
             ],
 
 

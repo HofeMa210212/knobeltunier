@@ -38,6 +38,7 @@ CREATE TABLE tournament (
 CREATE TABLE matchPlayer (
     id INTEGER PRIMARY KEY,
     playerId INTEGER,
+    rank INTEGER DEFAULT NULL,
     number INTEGER,
     isInMatch BOOLEAN,
     FOREIGN KEY (playerId) REFERENCES player(id) ON DELETE CASCADE

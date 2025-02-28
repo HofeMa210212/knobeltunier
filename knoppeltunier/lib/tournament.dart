@@ -49,21 +49,22 @@ class Tournament{
   List<MatchPlace> get places => List.unmodifiable(_places);
 
 
-  Future<void> addPlayer(Player p, int tournamentId,c.BuildContext context) async {
+  Future<void> addPlayer(Player p, int tournamentId, [c.BuildContext? context]) async {
     final db = await dbController();
 
     if (!_players.contains(p) && soldTickets() + p.lifes <= ticketCount) {
       _players.add(p);
       addPlayerDb(db, p.fName, p.lName, p.lifes, tournamentId);
-
     } else {
-      snackBar s = snackBar();
-      s.showAppleStyleSnackbar(context, "Spieler ${p.fName} ${p.lName} konnte nicht zum Tunier hinzugefügt werden!");
+      if (context != null) {
+        snackBar s = snackBar();
+        s.showAppleStyleSnackbar(context, "Spieler ${p.fName} ${p.lName} konnte nicht zum Turnier hinzugefügt werden!");
+      }
 
       throw Exception('Player ${p.fName} ${p.lName} could not be added to this Tournament.');
-
     }
   }
+
 
   Future<void> addMatchPlace(MatchPlace mP, int tournamentId) async {
     final db = await dbController();
@@ -190,6 +191,7 @@ class Tournament{
     int cycles = 0;
     Random r = Random();
 
+
     for (Player p in _players) {
       for (int i = 0; i < p.lifes; i++) {
         MatchPlayer mP = MatchPlayer(
@@ -225,14 +227,38 @@ class Tournament{
 
   }
 
-  void nextRound(){
+  Future<void> nextRound() async {
+    Database db =  await dbController();
     List<MatchPlayer> matchPlayers = [];
+
+      if(_matches.length ==1) {
+        executeQuery(db, '''
+      UPDATE matchPlayer SET rank = 1 WHERE id = ${_matches[0].winner!.id};
+      ''');
+      }
 
     if(allMatchesPlayed()){
 
       for(Match m in _matches){
         matchPlayers.add(m.winner!);
+
+
+        Player loser = (m.player1.id == m.winner!.id) ? m.player2 : m.player1;
+
+        print("Gewinner ist ${m.winner!.fName}");
+        executeQuery(db, '''
+        UPDATE matchPlayer 
+        SET rank = (SELECT COUNT(*) FROM match WHERE tournamentId = ${this.id}) * 2 
+        WHERE id = ${loser.id};
+        ''');
+
+
+
       }
+
+
+
+
 
       _matches = _createMatches(matchPlayers);
       generateMatchTimes(DateTime.now(), matchLength);
@@ -251,7 +277,8 @@ class Tournament{
     int cycles = 0;
     int tolerance = 1;
 
-    // Vorschau der Spielerpaare, um Duplikate zu minimieren
+
+
     Map<String, int> matchHistory = {};
 
     while (true) {
@@ -544,7 +571,6 @@ class Tournament{
     Database db = await dbController();
 
 
-    // Initialisiere die Tische
     for(MatchPlace mP in _places){
       mP.startime = startTime;
       mP.matchLength = matchTimeLength;
@@ -558,7 +584,6 @@ class Tournament{
       MatchPlace? assignedPlace;
       DateTime assignedTime = startTime;
 
-      // Suche einen passenden Platz und Zeitpunkt für das Match
       while (true) {
         // Finde den Platz mit den wenigsten Matches
         MatchPlace potentialPlace = _places.reduce((a, b) =>

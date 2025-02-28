@@ -3,7 +3,7 @@ class Player{
    String fName;
    String lName;
    int? id;
-  int lifes;
+    int lifes;
 
 
    Player({
