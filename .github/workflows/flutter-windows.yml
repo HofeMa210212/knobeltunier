@@ -28,7 +28,7 @@ jobs:
         working-directory: knoppeltunier
 
       - name: Artefakte hochladen
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-app
           path: knoppeltunier/build/windows/runner/Release/
