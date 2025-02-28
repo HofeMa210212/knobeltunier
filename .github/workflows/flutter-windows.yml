@@ -18,11 +18,10 @@ jobs:
         with:
           flutter-version: 3.19.0
 
-      # Erster Build: knoppeltunier
-      - name: Upgrade Flutter für knoppeltunier
+      - name: Flutter upgraden (falls nötig)
         run: flutter upgrade
-        working-directory: knoppeltunier
 
+      # Erster Build: knoppeltunier
       - name: Abhängigkeiten holen für knoppeltunier
         run: flutter pub get
         working-directory: knoppeltunier
@@ -38,10 +37,6 @@ jobs:
           path: knoppeltunier/build/windows/x64/runner/Release/
 
       # Zweiter Build: knoppeltunier_view
-      - name: Upgrade Flutter für knoppeltunier_view
-        run: flutter upgrade
-        working-directory: knoppeltunier_view
-
       - name: Abhängigkeiten holen für knoppeltunier_view
         run: flutter pub get
         working-directory: knoppeltunier_view
