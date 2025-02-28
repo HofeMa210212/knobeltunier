@@ -7,9 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
-
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v3
@@ -18,7 +17,10 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.19.0
-          cache: true
+
+      - name: Upgrade Flutter
+        run: flutter upgrade
+        working-directory: knoppeltunier  # Falls dein Flutter-Projekt in einem Unterordner liegt
 
       - name: Abhängigkeiten holen
         run: flutter pub get
