@@ -21,6 +21,11 @@ jobs:
       - name: Flutter upgraden (falls nötig)
         run: flutter upgrade
 
+      - name: Repository vollständig auschecken
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
     
       # Zweiter Build: knoppeltunier_view
       - name: Abhängigkeiten holen für knoppeltunier_view
