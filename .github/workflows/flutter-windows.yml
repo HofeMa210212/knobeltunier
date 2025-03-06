@@ -1,7 +1,4 @@
-
-
-
-name: Check Directory Structure
+name: Build Flutter Windows Apps
 
 on:
   push:
@@ -10,12 +7,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  list-files:
+  build-windows:
     runs-on: windows-latest
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v3
+        with:
+          path: repo
 
-      - name: Verzeichnisinhalt anzeigen
-        run: dir
+      - name: Flutter installieren
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.19.0
 
+      - name: Flutter upgraden (falls nötig)
+        run: flutter upgrade
+        working-directory: repo
+
+      - name: Zeige Verzeichnisstruktur
+        run: ls -R
+        working-directory: repo
+
+      # knoppeltunier_view Build
+      - name: Abhängigkeiten holen für knoppeltunier_view
+        run: flutter pub get
+        working-directory: D:\a\knobeltunier\knobeltunier/knoppeltunier_view
+
+      - name: Windows-App bauen für knoppeltunier_view
+        run: flutter build windows
+        working-directory: D:\a\knobeltunier\knobeltunier/knoppeltunier_view
+
+      - name: Artefakte hochladen für knoppeltunier_view
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-app-knoppeltunier-view
+          path: repo/knoppeltunier_view/build/windows/x64/runner/Release/
