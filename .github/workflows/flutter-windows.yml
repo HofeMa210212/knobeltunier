@@ -21,21 +21,7 @@ jobs:
       - name: Flutter upgraden (falls nötig)
         run: flutter upgrade
 
-      # Erster Build: knoppeltunier
-      - name: Abhängigkeiten holen für knoppeltunier
-        run: flutter pub get
-        working-directory: knoppeltunier
-
-      - name: Windows-App bauen für knoppeltunier
-        run: flutter build windows
-        working-directory: knoppeltunier
-
-      - name: Artefakte hochladen für knoppeltunier
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-app-knoppeltunier
-          path: knoppeltunier/build/windows/x64/runner/Release/
-
+    
       # Zweiter Build: knoppeltunier_view
       - name: Abhängigkeiten holen für knoppeltunier_view
         run: flutter pub get
