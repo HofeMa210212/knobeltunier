@@ -31,14 +31,14 @@ jobs:
       # knoppeltunier_view Build
       - name: Abhängigkeiten holen für knoppeltunier_view
         run: flutter pub get
-        working-directory: D:\a\knobeltunier\knobeltunier\repo\knobeltunier_view
+        working-directory: D:\a\knobeltunier\knobeltunier\repo\knoppeltunier
 
       - name: Windows-App bauen für knoppeltunier_view
-        run: flutter build windows
-        working-directory: D:\a\knobeltunier\knobeltunier\repo\knobeltunier_view
+        run: flutter build windows --target=lib/windows/projector_view_main.dart
+        working-directory: D:\a\knobeltunier\knobeltunier\repo\knoppeltunier
 
       - name: Artefakte hochladen für knoppeltunier_view
         uses: actions/upload-artifact@v4
         with:
           name: windows-app-knoppeltunier-view
-          path: D:\a\knobeltunier\knobeltunier\repo\knobeltunier_view/build/windows/x64/runner/Release/
+          path: D:\a\knobeltunier\knobeltunier\repo\knoppeltunier/build/windows/x64/runner/Release/
