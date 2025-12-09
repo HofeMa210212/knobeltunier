@@ -76,7 +76,7 @@ class _MatchesColumnState extends State<MatchesColumn> {
                      child: Row(
                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                        children: [
-                         _buildText("${matchIndex + 1}.", 0.03),
+                         _buildText("${match.matchNr}.", 0.03),
                          showTimes
                              ? _buildText(
                              "${match.time?.hour.toString().padLeft(2, '0')}:${match.time?.minute.toString().padLeft(2, '0')}",

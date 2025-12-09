@@ -55,7 +55,10 @@ class Tournament extends HiveObject with ChangeNotifier {
     this.matchLength =2
   }) : id = _idCounter++;
 
-  List<TournamentMatch> get matches => _matches;
+  List<TournamentMatch> get matches{
+    _matches.sort((a,b)=> a.matchNr.compareTo(b.matchNr));
+    return _matches;
+  }
 
   List<MatchPlace> get places => _places;
 
@@ -118,8 +121,6 @@ class Tournament extends HiveObject with ChangeNotifier {
 
     return foundPlayers;
   }
-
-
 
   void addPlayer(Player p) {
     _players.add(p);
@@ -409,7 +410,7 @@ class Tournament extends HiveObject with ChangeNotifier {
 
     for (TournamentMatch m in _matches) {
       for (MatchPlayer p in [m.player1, m.player2]) {
-        String id = p.fName + p.lName;
+        String id = "${p.fName} ${p.lName}";
         if (data.containsKey(id)) {
           data[id] = "${data[id]}, ${m.matchNr}";
         } else {
@@ -418,6 +419,11 @@ class Tournament extends HiveObject with ChangeNotifier {
         print(data[id] ?? "");
       }
     }
+
+    for(var k in data.keys){
+      print("${k}: ${data[k]}");
+    }
+
 
     // Map in Liste von Maps umwandeln
     List<Map<String, String>> result = data.entries.map((e) {
@@ -439,9 +445,7 @@ class Tournament extends HiveObject with ChangeNotifier {
 
     int pageCount = (players.length/ rowsPerPage).ceil();
 
-    print("Anzahl Spieler: ${players.length}");
 
-    print("Seiten: $pageCount");
 
     for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
       pdf.addPage(
@@ -452,6 +456,10 @@ class Tournament extends HiveObject with ChangeNotifier {
                   children: List.generate(
                     rowsPerPage,
                         (index) {
+
+                      if(index + rowsPerPage * pageIndex >= tournamentData.length){
+                        return pw.Container();
+                      }
 
                       return pw.Container(
                           width: 400, // Angepasste Breite für die PDF-Darstellung
