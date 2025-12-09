@@ -17,6 +17,8 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 
+import 'package:path/path.dart' as p;
+
 
 part 'tournament.g.dart';
 
@@ -508,14 +510,19 @@ class Tournament extends HiveObject with ChangeNotifier {
     }
 
 
-    String? filePath = await FilePicker.platform.getDirectoryPath();
+    String? dirPath = await FilePicker.platform.getDirectoryPath();
 
-    if(filePath != null){
-      filePath = "${filePath}/${this.name}_${tournamentData.length}_matches.pdf";
-      final file = File(filePath!);
+    if (dirPath != null) {
+      final filePath = p.join(
+        dirPath,
+        "${this.name}_${tournamentData.length}_matches.pdf",
+      );
+
+      final file = File(filePath);
       await file.writeAsBytes(await pdf.save());
+
       print("PDF erfolgreich gespeichert auf: $filePath");
-    }else{
+    } else {
       print("Keine Auswahl getroffen.");
     }
 
