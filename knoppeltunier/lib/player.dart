@@ -23,7 +23,7 @@ class Player{
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! Player) return false;
-    return fName == other.fName && lName == other.lName && id == other.id;
+    return fName == other.fName && lName == other.lName;
   }
 
   @override

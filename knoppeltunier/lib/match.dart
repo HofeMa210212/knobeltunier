@@ -10,7 +10,7 @@ class Match{
   MatchPlayer? winner;
   String? place;
   DateTime? time;
-   int? id;
+  int? id;
 
    Match({
     required this.player1,

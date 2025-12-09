@@ -10,6 +10,7 @@ import 'package:knobeltunier/match_place.dart';
 import 'package:knobeltunier/player.dart';
 import 'package:knobeltunier/tournament.dart';
 import 'package:knobeltunier/views/match_view.dart';
+import 'package:knobeltunier/views/rank_view.dart';
 
 import '../widgets/widgets.dart';
 
@@ -196,7 +197,7 @@ class _StartViewState extends State<StartView>{
                         },
                         child: Container(
                           margin: EdgeInsetsDirectional.only(top: 5),
-                          width: MediaQuery.of(context).size.width * 0.21,
+                          width: MediaQuery.of(context).size.width * 0.17,
                           height: 50,
                           decoration: BoxDecoration(
                             color: (selectedTournament == tournamentIndex) ? Color(0x992C2C2C) : basicContainerColor,
@@ -224,7 +225,7 @@ class _StartViewState extends State<StartView>{
                                   ),
                                 ),
                                 Container(
-                                  width: MediaQuery.of(context).size.width * 0.09,
+                                  width: MediaQuery.of(context).size.width * 0.05,
         
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
@@ -248,6 +249,19 @@ class _StartViewState extends State<StartView>{
         
                       IconButton(
                         onPressed: () async {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (builder) => RankView(toudnamentId: _tournaments[tournamentIndex].id))
+                            );
+                        },
+                        icon: Icon(
+                          Icons.bar_chart,
+                          color: Colors.white60,
+                          size: 34,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () async {
                             await changeToMatchView(tournamentIndex);
                         },
                         icon: Icon(
@@ -256,7 +270,7 @@ class _StartViewState extends State<StartView>{
                           size: 34,
                         ),
                       ),
-        
+
                     ],
                   );
                 }),
@@ -267,8 +281,6 @@ class _StartViewState extends State<StartView>{
               //Container für die Erstellung neuer Tournaments
               Column(
                 children: [
-        
-        
                   Center(
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.2,

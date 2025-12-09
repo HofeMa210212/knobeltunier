@@ -16,6 +16,7 @@ import 'package:knobeltunier/match.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../match_player.dart';
+import '../pdf/makeProjectorViewPdf.dart';
 
 class MatchView extends StatefulWidget {
   final Tournament tournament;
@@ -31,6 +32,7 @@ class _MatchViewState extends State<MatchView> {
   late Tournament tournament;
   double rowHight = 40;
   bool markePlayedMatches = false;
+  bool showTimes = false;
 
 
 
@@ -68,6 +70,33 @@ class _MatchViewState extends State<MatchView> {
         backgroundColor: basicBackgroundColor,
 
         actions: [
+          IconButton(
+            tooltip: "Check matches",
+            onPressed: (){
+             tournament.checkMatches();
+            },
+            icon: Icon(
+              Icons.check_circle_outlined,
+              color: Colors.white54,
+              size: 35,
+            ),
+          ),
+          SizedBox(width: 30),
+
+
+          Switch(
+            value: showTimes,
+            onChanged: (value){
+              setState(() {
+                showTimes = value;
+              });},
+            activeColor: Colors.green,
+            inactiveThumbColor: basicContainerColor,
+            inactiveTrackColor: basicContainerColor2,
+
+
+          ),
+          SizedBox(width: 30),
           Switch(
             value: markePlayedMatches,
             onChanged: (value){
@@ -82,13 +111,15 @@ class _MatchViewState extends State<MatchView> {
           ),
           SizedBox(width: 30),
 
+
+
           IconButton(
-            tooltip: "Projector view",
-            onPressed: () async{
-              _openNewWindow();
+            tooltip: "PDF Players",
+            onPressed: (){
+              generateMatchesPdf(tournament.id);
             },
             icon: Icon(
-              Icons.video_camera_back,
+              Icons.print,
               color: Colors.white54,
               size: 35,
             ),
@@ -96,7 +127,7 @@ class _MatchViewState extends State<MatchView> {
           SizedBox(width: 30),
 
           IconButton(
-            tooltip: "PDF",
+            tooltip: "PDF Tournaments",
             onPressed: (){
               setState(() {
                tournament.generateMatchesPdf();
@@ -227,6 +258,8 @@ class _MatchViewState extends State<MatchView> {
                           ),
                         ),
 
+
+                          (showTimes) ?
                         Container(
                           width: MediaQuery.of(context).size.width * 0.03,
 
@@ -243,7 +276,9 @@ class _MatchViewState extends State<MatchView> {
                               ),
                             ),
                           ),
-                        ),
+                        ) : Container(  width: MediaQuery.of(context).size.width * 0.01,),
+
+
 
                         Container(
                           height: rowHight,
@@ -399,6 +434,8 @@ class _MatchViewState extends State<MatchView> {
                                 ),
                               ),
 
+
+                              (showTimes) ?
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.03,
 
@@ -415,7 +452,7 @@ class _MatchViewState extends State<MatchView> {
                                     ),
                                   ),
                                 ),
-                              ),
+                              ) : Container(  width: MediaQuery.of(context).size.width * 0.01,),
 
                               Container(
                                 height: rowHight,
@@ -576,22 +613,26 @@ class _MatchViewState extends State<MatchView> {
                               ),
                             ),
                           ),
+
+                          (showTimes) ?
                           Container(
                             width: MediaQuery.of(context).size.width * 0.03,
+
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Center(
                                 child: AutoSizeText(
-                                  "${match.time?.hour.toString().padLeft(2, '0')}:${match.time?.minute.toString().padLeft(2, '0')}",
+                                  "${tournament.matches[matchIndex].time?.hour.toString().padLeft(2, '0')}:${tournament.matches[matchIndex].time?.minute.toString().padLeft(2, '0')}"
+                                  ,
                                   style: GoogleFonts.roboto(
-                                    color: Colors.white60,
-                                    fontSize: 18,
-                                  ),
+                                      color: Colors.white60,
+                                      fontSize: 18),
                                   maxFontSize: 18,
                                 ),
                               ),
                             ),
-                          ),
+                          ) : Container(  width: MediaQuery.of(context).size.width * 0.01,),
+
                           Container(
                             height: rowHight,
                             width: MediaQuery.of(context).size.width * 0.025,
@@ -709,8 +750,6 @@ class _MatchViewState extends State<MatchView> {
           ],
         ),
       ),
-
-
 
 
 

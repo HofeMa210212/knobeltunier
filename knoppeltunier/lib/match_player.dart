@@ -13,8 +13,8 @@ class MatchPlayer extends Player {
     required int lifes,
     required this.isInMatch,
     required this.number,
-    int? id, // Optional übergebene ID
-  })  : id = id ?? _idCounter++, // Verwende übergebene ID oder generiere automatisch
+    int? id,
+  })  : id = id ?? _idCounter++,
         super(fName: fName, lName: lName, lifes: lifes);
 
   static Future<void> initializeIdCounter(Database db) async {

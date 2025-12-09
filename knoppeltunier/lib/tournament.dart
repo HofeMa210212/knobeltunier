@@ -191,6 +191,15 @@ class Tournament{
     int cycles = 0;
     Random r = Random();
 
+    await executeQuery(db,'''
+    DELETE FROM matchPlayer
+    WHERE playerId IN (
+    SELECT p.id
+    FROM player p
+    WHERE p.tournamentId = ${this.id}
+);
+    
+    ''');
 
     for (Player p in _players) {
       for (int i = 0; i < p.lifes; i++) {
@@ -276,8 +285,6 @@ class Tournament{
     Random random = Random();
     int cycles = 0;
     int tolerance = 1;
-
-
 
     Map<String, int> matchHistory = {};
 
@@ -732,6 +739,41 @@ ORDER BY match.matchNumber;
 
   }
 
+  void checkMatches(){
+    int count = 0;
+    for(Match m in _matches){
+      if(m.player1.fName == m.player2.fName && m.player1.lName == m.player2.lName){
+        print("Spieler gleich: ${m.player1.fName} ${m.player1.lName}");
+        count ++;
+      }
+    }
+    print("Matches in denen Spieler gleich sind: $count");
+
+    Set<String> checkedPairs = {};
+
+    for (int i = 0; i < _matches.length; i++) {
+      for (int j = i + 1; j < _matches.length; j++) {
+        Match m1 = _matches[i];
+        Match m2 = _matches[j];
+
+        bool samePair =
+            m1.player1.fName == m2.player1.fName &&
+                m1.player1.lName == m2.player1.lName &&
+                m1.player2.fName == m2.player2.fName &&
+                m1.player2.lName == m2.player2.lName;
+
+        if (samePair) {
+          String pairKey = "${m1.player1.fName} ${m1.player1.lName} vs ${m1.player2.fName} ${m1.player2.lName}";
+          if (!checkedPairs.contains(pairKey)) {
+            print("Diese Spieler haben zweimal gegeneinander gespielt: $pairKey");
+            checkedPairs.add(pairKey); // Damit es nicht mehrfach ausgegeben wird
+          }
+        }
+      }
+    }
+
+  }
+
   int getAvailableTickets() {
 
     int soldTickets = 0;
@@ -760,7 +802,6 @@ ORDER BY match.matchNumber;
 
     return foundPlayers;
   }
-
 
 }
 

@@ -7,6 +7,7 @@ import 'package:knobeltunier/db/database.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../global_variables.dart';
+import '../pdf/makeProjectorViewPdf.dart';
 
 
 
@@ -72,6 +73,8 @@ AND EXISTS (
     });
   }
 
+
+
   @override
   void initState() {
     super.initState();
@@ -89,6 +92,21 @@ AND EXISTS (
           backgroundColor: basicBackgroundColor,
          toolbarHeight: 50,
          actions: [
+           IconButton(
+             tooltip: "PDF",
+             onPressed: (){
+               setState(() {
+
+                 generateMatchesPdf(tournamentId);
+               });
+             },
+             icon: Icon(
+               Icons.picture_as_pdf,
+               color: Colors.white54,
+               size: 35,
+             ),
+           ),
+           SizedBox(width: 30),
            IconButton(
              tooltip: "Größe anpassen",
              onPressed: (){
@@ -329,3 +347,4 @@ AND EXISTS (
 
   }
 }
+
