@@ -20,25 +20,20 @@ jobs:
         with:
           flutter-version: 3.19.0
 
-      - name: Flutter upgraden (falls nötig)
-        run: flutter upgrade
+      - name: Windows Desktop aktivieren
+        run: flutter config --enable-windows-desktop
         working-directory: repo
 
-      - name: Zeige Verzeichnisstruktur
-        run: ls -R
-        working-directory: repo
-
-      # knoppeltunier_view Build
-      - name: Abhängigkeiten holen für knoppeltunier_view
+      - name: Abhängigkeiten holen für knobeltunier_v2
         run: flutter pub get
-        working-directory: D:\a\knobeltunier\knobeltunier\repo\knoppeltunier
+        working-directory: repo/knobeltunier_v2
 
-      - name: Windows-App bauen für knoppeltunier_view
-        run: flutter build windows --target=lib/windows/projector_view_main.dart
-        working-directory: D:\a\knobeltunier\knobeltunier\repo\knoppeltunier
+      - name: Windows-App bauen für knobeltunier_v2
+        run: flutter build windows --release
+        working-directory: repo/knobeltunier_v2
 
-      - name: Artefakte hochladen für knoppeltunier_view
+      - name: Artefakte hochladen
         uses: actions/upload-artifact@v4
         with:
-          name: windows-app-knoppeltunier-view
-          path: D:\a\knobeltunier\knobeltunier\repo\knoppeltunier/build/windows/x64/runner/Release/
+          name: windows-app-knobeltunier
+          path: repo/knobeltunier_v2/build/windows/x64/runner/Release/
