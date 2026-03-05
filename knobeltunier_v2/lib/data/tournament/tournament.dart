@@ -42,7 +42,6 @@ class Tournament extends HiveObject with ChangeNotifier {
   List<MatchPlayer> _matchPlayers = [];
 
 
-
   TournamentList? parentList;
 
   static int _idCounter =0;
@@ -56,8 +55,15 @@ class Tournament extends HiveObject with ChangeNotifier {
   }) : id = _idCounter++;
 
   List<TournamentMatch> get matches{
+    List<TournamentMatch> notPlayedMatches = [];
+
     _matches.sort((a,b)=> a.matchNr.compareTo(b.matchNr));
-    return _matches;
+
+    for(TournamentMatch m in _matches){
+      if(!m.played) notPlayedMatches.add(m);
+    }
+
+    return notPlayedMatches;
   }
 
   List<MatchPlace> get places => _places;
@@ -196,11 +202,11 @@ class Tournament extends HiveObject with ChangeNotifier {
 
     List<MatchPlayer> matchPlayers = [];
     this.matchLength = matchLength;
-    _matches = [];
+
+    _matches.clear();
+
     int cycles = 0;
     Random r = Random();
-
-
 
     for (Player p in _players) {
       for (int i = 0; i < p.lifes; i++) {
@@ -216,7 +222,7 @@ class Tournament extends HiveObject with ChangeNotifier {
       }
     }
 
-    _matches = _createMatches(matchPlayers);
+    _matches += _createMatches(matchPlayers);
     final now = DateTime.now();
     print(startTime);
     generateMatchTimes(DateTime(
@@ -230,11 +236,13 @@ class Tournament extends HiveObject with ChangeNotifier {
     saveParent();
   }
 
-  List<TournamentMatch> _createMatches(List<MatchPlayer> players) {
+  List<TournamentMatch> _createMatches(List<MatchPlayer> players, {bool clear = false}) {
     List<TournamentMatch> matches = [];
     Random random = Random();
     int cycles = 0;
     int tolerance = 1;
+
+    if(clear) _matches = [];
 
     Map<String, int> matchHistory = {};
 
@@ -253,43 +261,44 @@ class Tournament extends HiveObject with ChangeNotifier {
         player.isInMatch = false;
       }
 
-      for (int i = 0; i < players.length; i++) {
-        MatchPlayer player1 = players[i];
-        if (player1.isInMatch) continue;
 
-        // Finde einen Gegner
-        MatchPlayer? opponent = players
-            .where((p) => !p.isInMatch && p != player1)
-            .reduce((a, b) {
-          int aScore = _matchScore(player1, a, matchHistory);
-          int bScore = _matchScore(player1, b, matchHistory);
-          return aScore < bScore ? a : b;
-        });
+        for (int i = 0; i < players.length; i++) {
+          MatchPlayer player1 = players[i];
+          if (player1.isInMatch) continue;
 
-        if (opponent == null) {
-          validMatches = false;
-          break;
+          // Finde einen Gegner
+          MatchPlayer? opponent = players
+              .where((p) => !p.isInMatch && p != player1)
+              .reduce((a, b) {
+            int aScore = _matchScore(player1, a, matchHistory);
+            int bScore = _matchScore(player1, b, matchHistory);
+            return aScore < bScore ? a : b;
+          });
+
+          if (opponent == null) {
+            validMatches = false;
+            break;
+          }
+
+          TournamentMatch match = TournamentMatch(player1: player1, player2: opponent,matchNr: machtNrCounter);
+          matches.add(match);
+          machtNrCounter ++;
+
+          // Spieler markieren
+          player1.isInMatch = true;
+          opponent.isInMatch = true;
+
+          // Historie aktualisieren
+          String matchKey = _matchKey(player1, opponent);
+          matchHistory[matchKey] = (matchHistory[matchKey] ?? 0) + 1;
+
+          // Toleranzprüfung
+          if (matchHistory[matchKey]! > tolerance) {
+            validMatches = false;
+            break;
+          }
         }
 
-        // Match erstellen
-        TournamentMatch match = TournamentMatch(player1: player1, player2: opponent,matchNr: machtNrCounter);
-        matches.add(match);
-        machtNrCounter ++;
-
-        // Spieler markieren
-        player1.isInMatch = true;
-        opponent.isInMatch = true;
-
-        // Historie aktualisieren
-        String matchKey = _matchKey(player1, opponent);
-        matchHistory[matchKey] = (matchHistory[matchKey] ?? 0) + 1;
-
-        // Toleranzprüfung
-        if (matchHistory[matchKey]! > tolerance) {
-          validMatches = false;
-          break;
-        }
-      }
 
       if (validMatches) break;
     }
@@ -372,32 +381,57 @@ class Tournament extends HiveObject with ChangeNotifier {
 
   bool allMatchesPlayed(){
 
-    for(TournamentMatch m in _matches){
+    for(TournamentMatch m in matches){
       if(m.winner == null) return false;
     }
     return true;
 
   }
 
+  List<TournamentMatch> getMatchesForPlayers(Player p){
+    List<TournamentMatch> foundMatches =  [];
+
+    for (TournamentMatch m in _matches) {
+        String id = "${p.fName} ${p.lName}";
+        String p1Id = "${m.player1.fName} ${m.player1.lName}";
+        String p2Id = "${m.player2.fName} ${m.player2.lName}";
+        if(id == p1Id || id == p2Id){
+          foundMatches.add(m);
+        }
+    }
+    return foundMatches;
+  }
+
+
   void nextRound()  {
     List<MatchPlayer> winners = [];
 
-    if(_matches.length ==1) {
-      _matches[0].winner!.rank =1;
-      _matchPlayers.add(_matches[0].winner!);
-    }
-
     if(allMatchesPlayed()){
-
-      for(TournamentMatch m in _matches){
+      for(TournamentMatch m in matches){
         winners.add(m.winner!);
-        m.loser!.rank = _matches.length *2;
+        m.loser!.rank = matches.length * 2;
         _matchPlayers.add(m.loser!);
+        print(matches.length);
+        if(matches.length == 1){
+          m.winner!.rank = 1;
+          _matchPlayers.add(m.winner!);
+          print("gewinner ist: ${m.winner!.fName}");
+        }
       }
 
 
-      _matches = _createMatches(winners);
-      generateMatchTimes(DateTime.now(), matchLength);
+        List<TournamentMatch> _newMatches = _createMatches(winners);
+        print("Anzahl der neuen mathces: ${_newMatches.length}");
+
+        if(_newMatches.length > 0){
+          for(TournamentMatch m in matches){
+            m.matchPlayed = true;
+          }
+          _matches += _newMatches;
+        }
+
+
+        //generateMatchTimes(DateTime.now(), matchLength);
 
     }
     notifyListeners();
@@ -408,7 +442,7 @@ class Tournament extends HiveObject with ChangeNotifier {
   List<Map<String, String>> getPlayerMatches() {
     Map<String, String> data = {};
 
-    for (TournamentMatch m in _matches) {
+    for (TournamentMatch m in matches) {
       for (MatchPlayer p in [m.player1, m.player2]) {
         String id = "${p.fName} ${p.lName}";
         if (data.containsKey(id)) {
@@ -540,6 +574,13 @@ class Tournament extends HiveObject with ChangeNotifier {
   void saveParent(){
     parentList?.save();
   }
+
+  void notify(){
+    notifyListeners();
+  }
+
+
+
 
 
 }

@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:knobeltunier_v2/data/player/matchplayer.dart';
+import 'package:knobeltunier_v2/data/player/player.dart';
 import 'package:knobeltunier_v2/data/tournament/tournament.dart';
 import 'package:knobeltunier_v2/data/tournament/tournament_list.dart';
 
@@ -25,7 +26,8 @@ class TournamentMatch extends HiveObject with ChangeNotifier{
   int? id;
   @HiveField(7)
   int matchNr;
-
+  @HiveField(8)
+  bool played;
 
 
   Tournament? parentList;
@@ -37,7 +39,8 @@ class TournamentMatch extends HiveObject with ChangeNotifier{
     this.time,
     this.id,
     this.parentList,
-    required this.matchNr
+    required this.matchNr,
+    this.played = false
   });
 
   @override
@@ -47,13 +50,29 @@ class TournamentMatch extends HiveObject with ChangeNotifier{
     return player1 == other.player1 && player2 == other.player2;
   }
 
-   set matchWinner(MatchPlayer mP){
+  set matchWinner(MatchPlayer mP){
     winner = mP;
 
     (winner == player1) ? loser = player2 : loser = player1;
 
     notifyListeners();
     saveParent();
+
+  }
+
+  set matchPlayed(bool played){
+    this.played = played;
+  }
+
+
+  bool won(Player p){
+
+    if(winner != null){
+      if(p.fName == winner?.fName && p.lName == winner?.lName){
+        return true;
+      }
+    }
+    return false;
 
   }
 

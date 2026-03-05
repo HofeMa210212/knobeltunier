@@ -149,7 +149,12 @@ class _MatchViewState extends State<MatchView> {
             onPressed: (){
               setState(() {
                 if(t.allMatchesPlayed()){
-                  t.nextRound();
+                  try{
+                    t.nextRound();
+                  } catch (e) {
+                    _showMatchErrorDialog(context);
+                    print("ACHTUNG!! [Beim erstellen der Matches ist ein fehler aufgetreten, es konnten nichte alle mathes generiert werden, eventuel wegen zu bielen gleichen Personen]");
+                  }
                 }
 
               });
@@ -189,4 +194,46 @@ class _MatchViewState extends State<MatchView> {
     );
 
   }
+}
+
+void _showMatchErrorDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: AppColors.basicContainerColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: const [
+            Icon(Icons.warning_amber_rounded, color: Colors.red),
+            SizedBox(width: 8),
+            Text(
+              "Match-Fehler",
+              style: TextStyle(
+                color: Colors.white
+              ),
+
+            ),
+          ],
+        ),
+        content: const Text(
+          "Es konnten nicht alle Matches generiert werden.\n"
+              "Möglicherweise sind zu viele gleiche Paarungen vorhanden "
+              "oder die Spieleranzahl ist ungerade oder zu gering.",
+          style: TextStyle(
+              color: Colors.white
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:knobeltunier_v2/Color/app_Colors.dart';
+import 'package:knobeltunier_v2/widgets/player_cotainer.dart';
 import 'package:provider/provider.dart';
 
 import '../data/tournament/tournament.dart';
@@ -105,115 +106,7 @@ class _PlayerSearchContainerState extends State<PlayerSearchContainer> {
                           child: ListView.builder(
                             itemCount: t.searchPlayer(regex).length,
                             itemBuilder: (context, playerIndex){
-                              return GestureDetector(
-                                onTap: (){
-                                  /*
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      /return EditPlayerDialog(context,t.searchPlayer(regex)[playerIndex], (String fname, String lname, int lifes) {
-
-                                        setState(() {
-                                          t.searchPlayer(regex)[playerIndex].fName = fname;
-                                          t.searchPlayer(regex)[playerIndex].lName = lname;
-                                          t.searchPlayer(regex)[playerIndex].lifes = lifes;
-
-                                        });
-
-                                      }, t, widget.onUpdate);
-                                    },
-                                  );
-                                   */
-                                },
-                                child: Row(
-                                  children: [
-                                    MouseRegion(
-                                      cursor: SystemMouseCursors.click, // oder ein anderer Cursor
-                                      child: Container(
-                                        margin: EdgeInsetsDirectional.only(top: 5),
-                                        width: MediaQuery.of(context).size.width * 0.24,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                            color: AppColors.basicContainerColor,
-                                            borderRadius: BorderRadius.circular(6)
-                                        ),
-
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.01),
-                                              width: MediaQuery.of(context).size.width * 0.07,
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Center(
-                                                  child: AutoSizeText(
-                                                    t.searchPlayer(regex)[playerIndex].fName,
-                                                    style: GoogleFonts.roboto(
-                                                      color: Colors.white70,
-                                                      fontSize: 22,
-                                                    ),
-                                                    maxFontSize: 22,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.01),
-                                              width: MediaQuery.of(context).size.width * 0.07,
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Center(
-                                                  child: AutoSizeText(
-                                                    t.searchPlayer(regex)[playerIndex].lName,
-                                                    style: GoogleFonts.roboto(
-                                                      color: Colors.white70,
-                                                      fontSize: 22,
-                                                    ),
-                                                    maxFontSize: 22,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.01),
-                                              width: MediaQuery.of(context).size.width * 0.07,
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Center(
-                                                  child: AutoSizeText(
-                                                    t.searchPlayer(regex)[playerIndex].lifes.toString(),
-                                                    style: GoogleFonts.roboto(
-                                                      color: Colors.white70,
-                                                      fontSize: 22,
-                                                    ),
-                                                    maxFontSize: 22,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-
-                                          ],
-                                        ),
-
-                                      ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () async {
-
-                                        setState(() {
-                                          t.removePlayer(t.searchPlayer(regex)[playerIndex]);
-                                        });
-
-                                      },
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: AppColors.basicAppRed,
-                                        size: 30,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
+                              return PlayerContainer(p: t.searchPlayer(regex)[playerIndex], t: t,);
                             },
                           ),
                         ),

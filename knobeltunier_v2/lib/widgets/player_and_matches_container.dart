@@ -27,8 +27,6 @@ class _PlayerAndMatchesContainerState extends State<PlayerAndMatchesContainer> {
       builder: (context, tournamentList,child){
         Tournament t =tournamentList.selectedTournament!;
 
-
-
         return ChangeNotifierProvider<Tournament>.value(
           value: t,
           child: Consumer<Tournament>(
@@ -36,9 +34,8 @@ class _PlayerAndMatchesContainerState extends State<PlayerAndMatchesContainer> {
               return  Column(
                 children: [
                   //Container zum wechseln der Ansicht zweischen Spieler und Matches
-
                   MouseRegion(
-                    cursor: SystemMouseCursors.click, // oder ein anderer Cursor
+                    cursor: SystemMouseCursors.click,
 
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.20,
