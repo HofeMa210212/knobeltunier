@@ -23,6 +23,7 @@ class TournamentMatchAdapter extends TypeAdapter<TournamentMatch> {
       time: fields[5] as DateTime?,
       id: fields[6] as int?,
       matchNr: fields[7] as int,
+      played: fields[8] as bool,
     )
       ..winner = fields[2] as MatchPlayer?
       ..loser = fields[3] as MatchPlayer?;
@@ -31,7 +32,7 @@ class TournamentMatchAdapter extends TypeAdapter<TournamentMatch> {
   @override
   void write(BinaryWriter writer, TournamentMatch obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.player1)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class TournamentMatchAdapter extends TypeAdapter<TournamentMatch> {
       ..writeByte(6)
       ..write(obj.id)
       ..writeByte(7)
-      ..write(obj.matchNr);
+      ..write(obj.matchNr)
+      ..writeByte(8)
+      ..write(obj.played);
   }
 
   @override
