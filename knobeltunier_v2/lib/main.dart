@@ -23,6 +23,9 @@ Future<void> main() async {
   Hive.registerAdapter(TournamentAdapter());
   Hive.registerAdapter(MatchPlaceAdapter());
 
+  await Hive.deleteBoxFromDisk('playerBox')
+  await Hive.deleteBoxFromDisk('matchBox')
+  await Hive.deleteBoxFromDisk('tournamentBox')
 
   await Hive.openBox<Player>('playerBox');
   await Hive.openBox<TournamentMatch>('matchBox');
